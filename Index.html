@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimate Cost Calculator</title>
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f4f5fa;
+            color: #333;
+            padding: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h1{
+            margin-top: -20px;
+font-size: 2.rem;
+            color: #442988;
+            text-align: center;
+            margin-bottom: -1rem;
+        }
+        h2,
+        h3 {
+            color: #5636a7;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        label {
+            color: #432a82;
+            font-weight: bold;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            /* Added bottom margin to create gap between label and costCalculations */
+        }
+
+        .header {
+            color: #5636a7;
+            font-size: 1.5rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            background-color: #fff;
+            border: 2px solid #5636a7;
+            border-radius: 0.5rem;
+            color: #333;
+            padding: 0.75rem;
+            width: 100%;
+            margin-top: 0.25rem;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+            /* Added to include padding and border in element's total width */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="text"]::placeholder,
+        input[type="number"]::placeholder,
+        textarea::placeholder {
+            color: #767680;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #4d3095, #3a2470);
+            /* Added gradient background */
+            color: #ffffff;
+            /* Changed button font color to white */
+
+            border: none;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 6px 20px rgba(0, 0, 0, 0.19);
+            /* Added highlight and shadow */
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3a2470, #4d3095);
+            /* Reversed gradient on hover */
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.23);
+            /* Increased shadow on hover */
+            transform: translateY(-3px);
+        }
+
+        #costCalculations,
+        .result,
+        .quote-template {
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.19);
+            /* Added back shadow */
+            border: 2px solid #5636a7;
+        }
+
+        #pdfModal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border-radius: 0.5rem;
+            width: 80%;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 25%;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: .5rem;
+        }
+
+        /* .pdfbtn{
+            margin-top: 1rem;
+margin-bottom: 1rem;
+        } */
+
+        .close {
+            color: #ffffff;
+            /* Changed color of .close #5636a7 */
+            font-family: "Material Symbols Outlined";
+            /* Changed font family to Material Symbols Outlined */
+            font-size: 31px;
+            font-weight: bold;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+
+        }
+
+        .color-palette {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .color-box {
+            width: 60px;
+            height: 60px;
+            margin: 0 0.5rem;
+            border-radius: 0.25rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .palette1 {
+            background-color: #5636a7;
+        }
+
+        .palette2 {
+            background-color: #4d3095;
+        }
+
+        .palette3 {
+            background-color: #432a82;
+        }
+
+        .palette4 {
+            background-color: #3a2470;
+        }
+
+        .palette5 {
+            background-color: #301e5d;
+        }
+
+        .checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.checkbox-container label {
+    margin-right: 15px;
+}
+
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Shivam Fabrication</h1>
+        <h2>Project Cost Calculator</h2>
+        <div class="mb-3">
+            <label for="customerName">Customer Name:</label>
+            <input type="text" id="customerName" placeholder="Customer Name">
+        </div>
+
+        <div class="mb-3">
+            <label for="rawMaterialCost">Raw Material Cost per kg (₹):</label>
+            <input type="number" id="rawMaterialCost" placeholder="Cost per kg" min="0">
+        </div>
+
+        <div class="mb-3">
+            <label for="rawMaterialKg">Raw Material Required (kg):</label>
+            <input type="number" id="rawMaterialKg" placeholder="Kg required" min="0">
+        </div>
+
+        <div class="mb-3">
+            <label for="labourCostPerKg">Fabrication Labour Cost per kg (₹):</label>
+            <input type="number" id="labourCostPerKg" placeholder="Labour cost per kg" min="0">
+        </div>
+
+        <div id="costCalculations">
+            <p>Total Raw Material Cost: ₹<span id="totalRawMaterialCost">0</span></p>
+            <p>Total Fabrication Labour Cost: ₹<span id="totalFabricationCost">0</span></p>
+            <p>Total Fabrication Item Cost: ₹<span id="totalFabricationItemCost">0</span></p>
+            <p>Total kg Rate: ₹<span id="totalKgRate">0</span></p>
+        </div>
+
+        <div class="mb-3">
+            <label for="installationCost">Installation Cost (₹):</label>
+            <select id="installationCost">
+                <option value="250">250₹</option>
+                <option value="500">500₹</option>
+                <option value="750">750</option>
+                <option value="1000">1000₹</option>
+                <option value="1250">1250</option>
+                <option value="1500">1500₹</option>
+                <option value="1750">1750</option>
+                <option value="2000">2000₹</option>
+                <option value="2250">2250</option>
+                <option value="2500">2500₹</option>
+                <option value="2750">2750</option>
+                <option value="3000">3000₹</option>
+                <option value="1250">3250</option>
+                <option value="3500">3500₹</option>
+                <option value="2750">3750</option>
+                <option value="4000">4000₹</option>
+                <option value="5000">5000</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="colorPaintCost">Color Paint Cost (₹):</label>
+            <select id="colorPaintCost">
+                <option value="0">Select Color Paint Cost</option>
+                <option value="250">250₹</option>
+                <option value="500">500₹</option>
+                <option value="750">750</option>
+                <option value="1000">1000₹</option>
+                <option value="1250">1250</option>
+                <option value="1500">1500₹</option>
+                <option value="1750">1750</option>
+                <option value="2000">2000₹</option>
+                <option value="2250">2250</option>
+                <option value="2500">2500₹</option>
+                <option value="2750">2750</option>
+                <option value="3000">3000₹</option>
+                <option value="1250">3250</option>
+                <option value="3500">3500₹</option>
+                <option value="2750">3750</option>
+                <option value="4000">4000₹</option>
+                <option value="5000">5000</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="loadingCost">Loading and Unloading Cost (₹):</label>
+            <select id="loadingCost">
+                <option value="0">Select Load and Unload Cost</option>
+                <option value="250">250₹</option>
+                <option value="500">500₹</option>
+                <option value="750">750</option>
+                <option value="1000">1000₹</option>
+                <option value="1250">1250</option>
+                <option value="1500">1500₹</option>
+                <option value="1750">1750</option>
+                <option value="2000">2000₹</option>
+                <option value="2250">2250</option>
+                <option value="2500">2500₹</option>
+                <option value="2750">2750</option>
+                <option value="3000">3000₹</option>
+                <option value="1250">3250</option>
+                <option value="3500">3500₹</option>
+                <option value="2750">3750</option>
+                <option value="4000">4000₹</option>
+                <option value="5000">5000</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="freightCost">Freight Cost (₹):</label>
+            <select id="freightCost">
+                <option value="0">Select Freight Cost</option>
+                <option value="250">250₹</option>
+                <option value="500">500₹</option>
+                <option value="750">750</option>
+                <option value="1000">1000₹</option>
+                <option value="1250">1250</option>
+                <option value="1500">1500₹</option>
+                <option value="1750">1750</option>
+                <option value="2000">2000₹</option>
+                <option value="2250">2250</option>
+                <option value="2500">2500₹</option>
+                <option value="2750">2750</option>
+                <option value="3000">3000₹</option>
+                <option value="1250">3250</option>
+                <option value="3500">3500₹</option>
+                <option value="2750">3750</option>
+                <option value="4000">4000₹</option>
+                <option value="5000">5000</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="hardwareCost">Hardware Cost (₹):</label>
+            <select id="hardwareCost">
+                <option value="0">Select Hardware Cost</option>
+                <option value="250">250₹</option>
+                <option value="500">500₹</option>
+                <option value="750">750</option>
+                <option value="1000">1000₹</option>
+                <option value="1250">1250</option>
+                <option value="1500">1500₹</option>
+                <option value="1750">1750</option>
+                <option value="2000">2000₹</option>
+                <option value="2250">2250</option>
+                <option value="2500">2500₹</option>
+                <option value="2750">2750</option>
+                <option value="3000">3000₹</option>
+                <option value="1250">3250</option>
+                <option value="3500">3500₹</option>
+                <option value="2750">3750</option>
+                <option value="4000">4000₹</option>
+                <option value="5000">5000</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="additionalComments">Additional Comments:</label>
+            <textarea id="additionalComments" placeholder="Enter additional comments here"></textarea>
+        </div>
+
+        <h3>Metals</h3>
+        <div class="checkbox-container">
+            <label><input type="checkbox" id="metalMS"> MS</label>
+            <label><input type="checkbox" id="metalSS202"> SS 202</label>
+            <label><input type="checkbox" id="metalSS304"> SS 304</label>
+        </div>
+        
+        <h3>Materials</h3>
+        <div class="checkbox-container">
+            <label><input type="checkbox" id="materialAngle"> Angle</label>
+            <label><input type="checkbox" id="materialUAngle"> UneqAngle</label>
+            <label><input type="checkbox" id="materialSqPipe"> Sq. Pipe</label>
+            <label><input type="checkbox" id="materialRPipe"> Round Pipe</label>
+            <label><input type="checkbox" id="materialsqbar"> Sq B.Bar</label>
+            <label><input type="checkbox" id="materialRbar"> Round B.Bar</label>
+            <label><input type="checkbox" id="materialflate"> B.Flate</label>
+            <label><input type="checkbox" id="materialpatti"> Patti</label>
+            <label><input type="checkbox" id="materialchannel"> C Channel</label>
+            <label><input type="checkbox" id="materialIbeam"> I beam</label>
+            <label><input type="checkbox" id="materialHbeam"> H beam</label>
+            <label><input type="checkbox" id="materialPSheet"> Profile Sheet .5mm</label>
+            <label><input type="checkbox" id="materialkaveluSheet"> Kavelu Sheet .5mm</label>
+            <label><input type="checkbox" id="materialCR Sheet"> CR Sheet</label>
+            <label><input type="checkbox" id="materialHRSheet"> HR Sheet</label>
+        </div>
+
+        <h3>Payment Terms</h3>
+        <div class="mb-3">
+            <label for="advancePercentage">Advance Payment (%):</label>
+            <input type="number" id="advancePercentage" value="70" min="0" max="100">
+        </div>
+
+        <div class="mb-3">
+            <label for="materialDeliveryPercentage">Against Material Delivery (%):</label>
+            <input type="number" id="materialDeliveryPercentage" value="13" min="0" max="100">
+        </div>
+
+        <div class="mb-3">
+            <label for="workStartPercentage">Against Work Start (%):</label>
+            <input type="number" id="workStartPercentage" value="10" min="0" max="100">
+        </div>
+
+        <div class="mb-3">
+            <label for="workInProgressPercentage">During Work (%):</label>
+            <input type="number" id="workInProgressPercentage" value="5" min="0" max="100">
+        </div>
+
+        <div class="mb-3">
+            <label for="finalWorkPercentage">Final Payment (%):</label>
+            <input type="number" id="finalWorkPercentage" value="2" min="0" max="100">
+        </div>
+
+        <button class="btn btn-primary" onclick="calculateTotal()">Calculate Total Cost</button>
+
+        <div class="result">
+            <p>Total Project Cost: ₹<span id="totalCost">0</span></p>
+            <p>Total Cost per kg: ₹<span id="totalCostPerKg">0</span></p>
+        </div>
+
+        <div id="quoteContainer" class="quote" style="display: none;">
+            <h3>Quote</h3>
+            <div id="quoteTemplate" class="quote-template"></div>
+            <textarea id="copyContent" style="display:none;"></textarea>
+            <button class="btn btn-primary" onclick="copyQuote()">Copy Quote</button>
+            <button class="btn btn-primary" onclick="previewPDF()">Preview PDF</button>
+        </div>
+
+        <!-- Modal to preview the PDF -->
+        <div id="pdfModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">Close_Fullscreen</span>
+                <img id="pdfImage" alt="PDF Preview" style="max-width: 100%; height: auto;" />
+                <div class="modal-buttons">
+                    <button class="btn btn-primary pdfbtn" onclick="generatePDF()">Generate PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- HTML2Canvas and jsPDF Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        function calculateTotal() {
+            let customerName = document.getElementById('customerName').value;
+
+            let rawMaterialCost = parseFloat(document.getElementById('rawMaterialCost').value) || 0;
+            let rawMaterialKg = parseFloat(document.getElementById('rawMaterialKg').value) || 0;
+
+            let labourCostPerKg = parseFloat(document.getElementById('labourCostPerKg').value) || 0;
+
+            let totalRawMaterialCost = rawMaterialCost * rawMaterialKg;
+            let totalFabricationCost = labourCostPerKg * rawMaterialKg;
+            let totalFabricationItemCost = totalRawMaterialCost + totalFabricationCost;
+            let totalKgRate = rawMaterialCost + labourCostPerKg;
+
+            document.getElementById('totalRawMaterialCost').textContent = totalRawMaterialCost.toFixed(2);
+            document.getElementById('totalFabricationCost').textContent = totalFabricationCost.toFixed(2);
+            document.getElementById('totalFabricationItemCost').textContent = totalFabricationItemCost.toFixed(2);
+            document.getElementById('totalKgRate').textContent = totalKgRate.toFixed(2);
+
+            let installationCost = parseFloat(document.getElementById('installationCost').value) || 0;
+            let colorPaintCost = parseFloat(document.getElementById('colorPaintCost').value) || 0;
+            let loadingCost = parseFloat(document.getElementById('loadingCost').value) || 0;
+            let freightCost = parseFloat(document.getElementById('freightCost').value) || 0;
+            let hardwareCost = parseFloat(document.getElementById('hardwareCost').value) || 0;
+
+            let totalCost = totalFabricationItemCost + installationCost + colorPaintCost + loadingCost + freightCost + hardwareCost;
+
+            let totalCostPerKg = rawMaterialKg ? (totalCost / rawMaterialKg) : 0;
+
+            document.getElementById('totalCost').textContent = totalCost.toFixed(2);
+            document.getElementById('totalCostPerKg').textContent = totalCostPerKg.toFixed(2);
+
+            let excludedCosts = [];
+            if (rawMaterialCost === 0) excludedCosts.push('Raw Material');
+            if (installationCost === 0) excludedCosts.push('Installation');
+            if (hardwareCost === 0) excludedCosts.push('Hardware');
+            if (freightCost === 0) excludedCosts.push('Freight');
+            if (colorPaintCost === 0) excludedCosts.push('Color Paint');
+            if (loadingCost === 0) excludedCosts.push('Loading/Unloading');
+
+            const additionalComments = document.getElementById('additionalComments').value;
+
+            // Payment Terms Calculation
+            let advancePercentage = parseFloat(document.getElementById('advancePercentage').value) || 0;
+            let materialDeliveryPercentage = parseFloat(document.getElementById('materialDeliveryPercentage').value) || 0;
+            let workStartPercentage = parseFloat(document.getElementById('workStartPercentage').value) || 0;
+            let workInProgressPercentage = parseFloat(document.getElementById('workInProgressPercentage').value) || 0;
+            let finalWorkPercentage = parseFloat(document.getElementById('finalWorkPercentage').value) || 0;
+
+            let advanceAmount = (advancePercentage / 100) * totalCost;
+            let materialDeliveryAmount = (materialDeliveryPercentage / 100) * totalCost;
+            let workStartAmount = (workStartPercentage / 100) * totalCost;
+            let workInProgressAmount = (workInProgressPercentage / 100) * totalCost;
+            let finalWorkAmount = (finalWorkPercentage / 100) * totalCost;
+
+
+
+// Metals and Materials
+let metals = [];
+if (document.getElementById('metalMS').checked) metals.push('MS');
+if (document.getElementById('metalSS202').checked) metals.push('SS 202');
+if (document.getElementById('metalSS304').checked) metals.push('SS 304');
+
+// Initialize crmaterials1 array
+let crmaterials1 = [];
+if (document.getElementById('materialPSheet').checked) crmaterials1.push('Profile Sheet .5mm');
+if (document.getElementById('materialkaveluSheet').checked) crmaterials1.push('Kavelu Sheet .5mm');
+if (document.getElementById('materialCR Sheet').checked) crmaterials1.push('CR Sheet');
+if (document.getElementById('materialHRSheet').checked) crmaterials1.push('HR Sheet');
+
+// Initialize materials array
+let materials = [];
+if (document.getElementById('materialAngle').checked) materials.push('Angle');
+if (document.getElementById('materialUAngle').checked) materials.push('UneqAngle');
+if (document.getElementById('materialSqPipe').checked) materials.push('Sq. Pipe');
+if (document.getElementById('materialRPipe').checked) materials.push('Round Pipe');
+if (document.getElementById('materialsqbar').checked) materials.push('Sq B.Bar');
+if (document.getElementById('materialRbar').checked) materials.push('Round B.Bar');
+if (document.getElementById('materialflate').checked) materials.push('B.Flate');
+if (document.getElementById('materialpatti').checked) materials.push('Patti');
+if (document.getElementById('materialchannel').checked) materials.push('C Channel');
+if (document.getElementById('materialIbeam').checked) materials.push('I beam');
+if (document.getElementById('materialHbeam').checked) materials.push('H beam');
+
+// Combine metals and materials into a single string
+let metalsMaterialsContent = metals.flatMap(metal => materials.map(material => `${metal} ${material}`)).join(', ');
+
+// Format crmaterials1 into a string
+let crMaterialsContent = crmaterials1.join(', ');
+
+// If both metalsMaterialsContent and crMaterialsContent are non-empty, join them with a comma
+let combinedMaterialsContent;
+if (metalsMaterialsContent && crMaterialsContent) {
+    combinedMaterialsContent = `${metalsMaterialsContent}, ${crMaterialsContent}`;
+} else {
+    combinedMaterialsContent = metalsMaterialsContent || crMaterialsContent;
+}
+
+// Output the combined result
+console.log(`*Material:* ${combinedMaterialsContent}`);
+
+
+
+            // Quote Content for copying
+            let quoteContent =
+                `The Quote for *${customerName} Ji*
+            \n*₹${totalCost.toFixed(2)}* and approx weight *${rawMaterialKg} kg*
+            \n*Material:* ${combinedMaterialsContent}
+
+            \n*Scope:*
+            \n- Fabrication`;
+            if (installationCost > 0) quoteContent += "\n- Installation";
+            if (hardwareCost > 0) quoteContent += "\n- Hardware";
+            if (colorPaintCost > 0) quoteContent += "\n- Color";
+            if (loadingCost > 0) quoteContent += "\n- Loading/Unloading";
+
+            // Adding Payment Terms
+            quoteContent += `
+            \n*Payment Terms:*
+            \n- Advance Payment: ₹${advanceAmount.toFixed(2)} (${advancePercentage}%)
+            \n- Against Material Delivery: ₹${materialDeliveryAmount.toFixed(2)} (${materialDeliveryPercentage}%)
+            \n- Against Work Start: ₹${workStartAmount.toFixed(2)} (${workStartPercentage}%)
+            \n- During Work: ₹${workInProgressAmount.toFixed(2)} (${workInProgressPercentage}%)
+            \n- Final Payment: ₹${finalWorkAmount.toFixed(2)} (${finalWorkPercentage}%)
+            \n`;
+
+            quoteContent += `\n *Note:*
+            \n* The above quote will change as market prices change on raw material.
+            \n* The above quote excludes GST, which is 18% and compulsory.
+            \n* If further working payment has not released, the working will be held.`;
+
+            if (excludedCosts.length > 0) {
+                const excludedCostsString = excludedCosts.join(', ');
+                const formattedExcludedCosts = excludedCostsString.replace(/,([^,]*)$/, ' and$1');
+                quoteContent += `
+                \n* The quote excludes any ${formattedExcludedCosts} Cost.`;
+            }
+            
+            
+            quoteContent += `\n${additionalComments}\n`;
+
+
+
+            // PDF Content with company details
+            const currentDate = new Date();
+            const dateTime = currentDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+
+            let pdfContent = `<div style="text-align: center;"><strong  class="header";>Shivam Fabrication Pvt Ltd</strong><br>GST Number: 23AFRPC3757Q1ZV<br> ${dateTime}<br><br></div>
+                              <div style="text-align: left;"><strong>The Quote for ${customerName} Ji</strong><br><br>
+                                ₹<strong>${totalCost.toFixed(2)}</strong> and approx weight <strong>${rawMaterialKg}</strong> kg<br>
+                                <br> <strong>Material:</strong> ${combinedMaterialsContent}<br>
+
+                                <strong><br>Scope:</strong><br>
+                                - Fabrication<br>`;
+            if (installationCost > 0) pdfContent += "- Installation<br>";
+            if (hardwareCost > 0) pdfContent += "- Hardware<br>";
+            if (colorPaintCost > 0) pdfContent += "- Color<br>";
+            if (loadingCost > 0) pdfContent += "- Loading/Unloading<br>";
+
+            if (excludedCosts.length > 0) {
+                const excludedCostsString = excludedCosts.join(', ');
+                const formattedExcludedCosts = excludedCostsString.replace(/,([^,]*)$/, ' and$1');
+                pdfContent += `<br>Note: <br> 
+                * The quote excludes any ${formattedExcludedCosts} Cost.<br>
+                * The above quote will change as market prices change<br>
+                * The above quote excludes GST, which is 18% and compulsory.<br>`;
+            }
+
+
+            pdfContent += `
+            <br>Payment Terms:
+            <br>- Advance Payment: ₹${advanceAmount.toFixed(2)} (${advancePercentage}%)
+            <br>- Against Material Delivery: ₹${materialDeliveryAmount.toFixed(2)} (${materialDeliveryPercentage}%)
+            <br>- Against Work Start: ₹${workStartAmount.toFixed(2)} (${workStartPercentage}%)
+            <br>- During Work: ₹${workInProgressAmount.toFixed(2)} (${workInProgressPercentage}%)
+            <br>- Final Payment: ₹${finalWorkAmount.toFixed(2)} (${finalWorkPercentage}%)`;
+
+
+            pdfContent += `<br>${additionalComments}<br>`;
+            pdfContent += `
+            <div style="text-align: center;">
+                <strong>Contact Us</strong><br>
+                           Address: 201 Fabrication Street, Sanwer Industrial Area, Indore, Madhya Pradesh, 452001<br>
+                           Phone: +91 9329852299<br>
+                           Email: info@shivamfabrication.com<br></div>`;
+
+            // Update the content containers
+            document.getElementById('quoteTemplate').innerHTML = pdfContent;
+            document.getElementById('copyContent').value = quoteContent;
+            document.getElementById('quoteContainer').style.display = 'block';
+        }
+
+        function copyQuote() {
+            const copyText = document.getElementById('copyContent');
+            copyText.style.display = 'block';
+            copyText.select();
+            document.execCommand('copy');
+            copyText.style.display = 'none';
+            alert('Quote copied to clipboard!');
+        }
+
+        async function previewPDF() {
+            const pdfTemplate = document.getElementById('quoteTemplate');
+            const pdfModal = document.getElementById('pdfModal');
+
+            html2canvas(pdfTemplate).then(canvas => {
+                const imageData = canvas.toDataURL('image/png');
+                document.getElementById('pdfImage').src = imageData;
+                pdfModal.style.display = 'block';
+            });
+        }
+
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const img = document.getElementById('pdfImage').src;
+
+            // Retrieve customer name and create a sanitized filename
+            let customerName = document.getElementById('customerName').value.trim();
+            if (customerName === "") {
+                customerName = "quote";
+            }
+            const sanitizedCustomerName = customerName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '_');
+            const pdfFilename = `${sanitizedCustomerName} Ji_Estimate.pdf`;
+
+            doc.addImage(img, 'PNG', 10, 10, 190, 280);  // Adjust to A4 size
+            doc.save(pdfFilename);
+        }
+
+
+        function closeModal() {
+            document.getElementById('pdfModal').style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
